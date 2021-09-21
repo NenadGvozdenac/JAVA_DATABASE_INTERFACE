@@ -1,0 +1,114 @@
+package database_work;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+
+import database_work._classes.Date;
+
+public class _database_functions {
+	
+	// Function for creating database, it is ONLY used if the program is first time started
+	public static void database_create(Connection _connection) throws SQLException {
+		// Declare statement for the query
+		Statement _statement = _connection.createStatement();
+		
+		// Execute the query to CREATE A NEW SCHEMA
+		_statement.executeUpdate("CREATE SCHEMA `student_info`;");
+		
+		// Execute the query to CREATE NEW TABLE
+		_statement.executeUpdate("CREATE TABLE STUDENT_INFO.STUDENTS ("
+				+ "student_id INT NOT NULL AUTO_INCREMENT,"
+				+ "student_name VARCHAR(24) NOT NULL,"
+				+ "student_lastname VARCHAR(24) NOT NULL,"
+				+ "student_grade FLOAT NOT NULL,"
+				+ "student_birthdate DATE NOT NULL,"
+				+ "PRIMARY KEY (student_id)"
+				+ ");"
+			);
+		
+		// Afterwards, close the statement so it doesnt waste memory
+		_statement.close();
+	}
+	
+	public static void database_addmember(Connection _connection, String name, String lastname, Float grade, Date birthdate) throws SQLException {
+		// Declare statement for the query
+		Statement _statement = _connection.createStatement();
+		
+		// Get the date
+		String date = birthdate.godina + "-" + birthdate.mesec + "-" + birthdate.dan;
+		// Execute the query to insert into table new data
+		_statement.executeUpdate("INSERT INTO STUDENT_INFO.STUDENTS (student_name, student_lastname, student_grade, student_birthdate) VALUES"
+				+ " ('" + name + "', '" + lastname + "', '" + grade + "', '" + date + "');");
+		_statement.close();
+	}
+	
+	public static void database_cmdoutput(Connection _connection) throws SQLException {
+		
+		Statement _statement = _connection.createStatement();
+		ResultSet select_query = _statement.executeQuery("SELECT * FROM STUDENT_INFO.STUDENTS");
+		
+		while(select_query.next()) {
+			ResultSet st = select_query;
+			System.out.println("ID: " + st.getInt(1) 
+				+ ", NAME: " + st.getString(2) 
+				+ ", LASTNAME: " + st.getString(3) 
+				+ ", GRADE: " + st.getFloat(4) 
+				+ ", BIRTH DATE: " + st.getDate(5)
+			);
+		}
+		_statement.close();
+	}
+	
+	public static void database_clear(Connection _connection) throws SQLException {
+		
+		Statement _statement = _connection.createStatement();
+		
+		_statement.executeUpdate("DELETE FROM STUDENT_INFO.STUDENTS WHERE STUDENT_ID > 0");
+		
+		_statement.executeUpdate("ALTER TABLE STUDENT_INFO.STUDENTS AUTO_INCREMENT = 1");
+		
+	}
+	
+	public static Boolean database_empty(Connection _connection) throws SQLException {
+		
+		Boolean isEmpty = false;
+		
+		Statement _statement = _connection.createStatement();
+		ResultSet select_query = _statement.executeQuery("SELECT * FROM STUDENT_INFO.STUDENTS");
+		
+		if(select_query.next() == false) {
+			isEmpty = true;
+		}
+		_statement.close();
+		return isEmpty;
+	}
+	
+	public static ArrayList<String> database_output(Connection _connection) throws SQLException {
+		
+		Statement _statement = _connection.createStatement();
+		ResultSet select_query = _statement.executeQuery("SELECT * FROM STUDENT_INFO.STUDENTS");
+		
+		ArrayList<String> results = new ArrayList<String>();
+		
+		while(select_query.next()) {
+			ResultSet st = select_query;
+			results.add(st.getInt(1) 
+				+ ":   " + (st.getDate(5)).toString().replace("-", "/")
+				+ ",    " + st.getFloat(4) 
+				+ ",    " + st.getString(2) 
+				+ " " + st.getString(3));
+		}
+		
+		_statement.close();
+		return results;
+	}
+	
+	public static void database_close(Connection _connection) throws SQLException {
+		
+		_connection.close();
+		
+	}
+}

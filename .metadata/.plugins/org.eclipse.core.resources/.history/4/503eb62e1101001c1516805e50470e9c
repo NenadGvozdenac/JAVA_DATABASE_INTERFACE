@@ -1,0 +1,51 @@
+package database_work;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+import javax.swing.*;
+
+public class _main extends _database_functions {
+	
+	public static JFrame frame = new JFrame();
+	public static Connection _connection;
+	
+	public static void main(String[] args) throws SQLException, ClassNotFoundException {
+		
+		Class.forName("com.mysql.cj.jdbc.Driver");
+		
+		// database_work();
+		frame_work();
+		
+	}
+	
+	public static void database_work() throws SQLException, ClassNotFoundException {
+		Class.forName("com.mysql.cj.jdbc.Driver");
+
+		_connection = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "gvozdenacnenad");
+		
+		database_addmember(_connection, "Nenad", 		"Gvozdenac", 	4.81f, new Date(12, 	2, 	2003));
+		database_addmember(_connection, "Aleksandar", 	"Varga", 		4.00f, new Date(21, 	4, 	2002));
+		database_addmember(_connection, "Stefan", 		"Pejinovic", 	4.53f, new Date(1, 		1, 	2002));
+		database_addmember(_connection, "Jovan", 		"Nikolic", 		2.21f, new Date(15, 	3, 	2001));
+		
+		database_cmdoutput(_connection);
+		
+		database_clear(_connection);
+		
+		database_close(_connection);
+	}
+	
+	public static void frame_work() {
+		
+		frame.setTitle("Rad sa bazama podataka");
+		frame.setVisible(true);
+		frame.setAlwaysOnTop(true);
+		frame.setSize(new Dimension(600, 400));
+		frame.setResizable(false);
+		frame.setBackground(new Color(228, 251, 255));
+	}
+}

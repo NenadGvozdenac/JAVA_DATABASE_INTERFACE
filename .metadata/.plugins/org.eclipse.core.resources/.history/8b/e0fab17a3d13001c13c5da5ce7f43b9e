@@ -1,0 +1,198 @@
+package database_work;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+import javax.swing.event.MouseInputAdapter;
+import javax.swing.JOptionPane;
+
+public class _buttons_functions {
+
+	public static Connection database_connection = _main._connection;
+	public static JFrame input_frame = _main.input_frame;
+	public static String name = new String(), lastname = new String(), grade = new String(), birthyear = new String();
+	
+	public static boolean mute_active = false;
+	
+	public static void exit_pressed(JFrame frame) throws SQLException {
+		
+		int result = JOptionPane.showConfirmDialog(
+	            frame,
+	            "Are you sure you want to exit the program?",
+	            "Exit Application",
+	            JOptionPane.YES_NO_OPTION);
+	 
+	        if (result == JOptionPane.YES_OPTION) {
+	        	System.exit(0);
+	        	_database_functions.database_close(database_connection);
+	        }
+	}
+	
+	public static void input_pressed(JFrame frame) throws SQLException {
+		_main.input_frame();
+		frame.setVisible(false);
+	}
+	
+	public static void output_pressed(JFrame frame) throws SQLException {
+		if(_database_functions.database_empty(database_connection) == true) 
+			JOptionPane.showMessageDialog(frame, "Database is empty.\nAdd some data!", "ERROR", JOptionPane.ERROR_MESSAGE);
+		else {
+			_main.output_frame();
+			frame.setVisible(false);
+			_database_functions.database_cmdoutput(database_connection);
+		}
+	}
+	
+	public static void clear_pressed(JFrame frame) throws SQLException {
+		if(_database_functions.database_empty(database_connection) == true)
+			JOptionPane.showMessageDialog(frame, "Database is already empty...", "ERROR", JOptionPane.ERROR_MESSAGE);
+		else {
+			_database_functions.database_clear(database_connection);
+			JOptionPane.showMessageDialog(frame, "Successfully cleared the database of all data!", "CLEARED", JOptionPane.INFORMATION_MESSAGE);
+		}
+	}
+	
+	public static void mute_pressed(JFrame frame) {
+		
+		if(mute_active == true) {
+			mute_active = false;
+			switch_icon()
+		}
+		
+	}
+	
+	public static void pressed(JFrame frame, JButton... buttons) {
+		
+		for(int i = 0; i < buttons.length; i++) {
+			switch(buttons[i].getText()) {
+				case "EXIT":
+					buttons[i].addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							try {
+								exit_pressed(frame);
+							} catch (SQLException e1) {
+								System.out.print("Exiting could not be done. Error.");
+								e1.printStackTrace();
+							}
+						}
+					});
+				break;
+				
+				case "INPUT":
+					buttons[i].addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							try {
+								input_pressed(frame);
+							} catch (SQLException e1) {
+								System.out.print("Could not input data. Error.");
+								e1.printStackTrace();
+							}
+						}
+					});
+				break;
+				
+				case "OUTPUT":
+					buttons[i].addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							try {
+								output_pressed(frame);
+							} catch (SQLException e1) {
+								System.out.print("Could not output data. Error.");
+								e1.printStackTrace();
+							}
+						}
+					});
+				break;
+				
+				case "CLEAR":
+					buttons[i].addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+								try {
+									clear_pressed(frame);
+								} catch (SQLException e1) {
+									System.out.print("Could not clear database. Error.");
+									e1.printStackTrace();
+								}
+						}
+					});
+				break;
+			}
+		}
+	}
+	
+	public static void input_string(JFrame frame, JButton button, JTextField... fields) throws SQLException {
+	
+		// Ako je dugmetov tekst "ADD", znaci da je korisnik zavrsio sa unosom podataka i treba da upise podatke u bazu
+		if(button.getText() == "ADD") {
+			// Dodajemo novi listener za dugme sa ovim nazivom
+			button.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					try {
+						// Ako dodje do greske, ispisujemo da je doslo do greske upisa podataka u bazu
+						// Dobijamo niz stringova za datestring, delimo ceo datum "DD/MM/YYYY" na samo dane, koje onda ubacujemo u Date klasu koju smo napravili
+						String[] datestring = fields[3].getText().split("/");
+						// pravimo novi date klasu
+						_classes.Date date = new _classes.Date(Integer.parseInt(datestring[0]), Integer.parseInt(datestring[1]), Integer.parseInt(datestring[2]));
+						
+						// grade ili ocena je ustvari float koji cemo samo prebaciti iz stringa koji je tipa "0.00"
+						Float grade = Float.parseFloat(fields[2].getText());
+						
+						if(grade > 5f) throw new Exception("Grade not valid");
+						
+						// Ubacujemo sve podatke u bazu pomocu funkcije database_addmember(Connection, String, String, Float, Date)
+						_database_functions.database_addmember(database_connection, fields[0].getText(), fields[1].getText(), grade, date);
+						
+						// Ispisujemo prozor koji kaze da je uspeh bio pri upisivanju podataka
+						JOptionPane.showMessageDialog(frame, "Successfully inputed data into database!", "SUCCESS", JOptionPane.INFORMATION_MESSAGE);
+						
+						// Resetujemo textboxove na nulu
+						reset_textboxes(frame, fields[0], fields[1], fields[2], fields[3]);
+					} catch (Exception ex) {
+						// Ukoliko dodje do greske ispisujemo da nije bilo moguce ovo uraditi
+						JOptionPane.showMessageDialog(frame, "Wrong data to be inputed into database. \nTry again.", "ERROR", JOptionPane.ERROR_MESSAGE);
+						reset_textboxes(frame, fields[0], fields[1], fields[2], fields[3]);
+					}
+				}
+			});
+		}
+	}
+	
+	public static void reset_textboxes(JFrame frame, JTextField... text) {
+		
+		for(JTextField c : text) {
+			c.setText(null);
+		}
+	}
+
+	public static void resettextonclick(JFrame input_frame2, JTextField... fields) {
+		for(JTextField c : fields) {
+			c.addMouseListener(new MouseInputAdapter() {
+				public void mouseClicked(MouseEvent e) {
+					c.selectAll();
+				}
+			});
+		}
+		
+	}
+
+	public static void addListener(JFrame frame, JButton button) {
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					try {
+						mute_pressed();
+					} catch (SQLException e1) {
+						System.out.print("Could not mute. Error.");
+						e1.printStackTrace();
+					}
+			}
+		});
+	}
+	
+}
+

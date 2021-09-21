@@ -1,0 +1,9 @@
+package database_work;
+
+import java.awt.Dimension;
+
+import javax.swing.*;
+
+public class _gui_interface extends _classes{
+
+}

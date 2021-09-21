@@ -1,0 +1,114 @@
+package database_work;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+
+public class _gui_interface {
+	
+	public static Color background_color = new Color(228, 251, 255);
+	
+	public static void create_window(JFrame frame, String title, Dimension dimension, int operation) {
+		frame.setDefaultCloseOperation(operation);
+		frame.setTitle(title);
+		frame.setAlwaysOnTop(true);
+		frame.setSize(dimension);
+		frame.setResizable(false);
+		frame.getContentPane().setBackground(background_color);
+		frame.setLocationRelativeTo(null);
+		frame.getContentPane().setLayout(null);
+	}
+
+	public static void add_label(JFrame frame, int x, int y, Font font, String string) {
+		JPanel panel = new JPanel();
+		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		
+		JLabel label = new JLabel(string);
+		label.setFont(font);
+		
+		panel.add(label);
+		panel.setBackground(background_color);
+		panel.setBounds(x, y, string.length() * 8, 30);
+		frame.getContentPane().add(panel);
+	}
+
+	public static JButton add_button(JFrame frame, int x, int y, Font font, String string) {
+		JPanel panel = new JPanel();
+		panel.setLayout(new FlowLayout(FlowLayout.CENTER));
+		
+		JButton button = new JButton(string);
+		button.setFont(font);
+		button.setPreferredSize(new Dimension(100, 40));
+		
+		panel.add(button);
+		panel.setBackground(background_color);
+		panel.setBounds(x, y, 100, 45);
+		frame.getContentPane().add(panel);
+		
+		return button;
+	}
+	
+	public static JTextField add_textBox(JFrame frame, int x, int y, Font font, String string) {
+		JPanel panel = new JPanel();
+		
+		JTextField textfield = new JTextField(string);
+		textfield.setSelectedTextColor(Color.blue);
+		textfield.setHorizontalAlignment(JTextField.CENTER);
+		textfield.setFont(font);
+		textfield.setPreferredSize(new Dimension(100, 40));
+		textfield.setAlignmentX(JTextField.CENTER);
+		
+		panel.add(textfield);
+		panel.setBackground(background_color);
+		panel.setBounds(x, y, 100, 45);
+		frame.getContentPane().add(panel);
+		
+		return textfield;
+	}
+	
+	public static void add_list(JFrame frame, int x, int y, Font font, DefaultListModel<String> list) {
+		JPanel panel = new JPanel();
+		
+		JList<String> lista = new JList<String>(list);
+		lista.setFont(font);
+		
+		JScrollPane pane = new JScrollPane(lista, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		pane.setPreferredSize(new Dimension(450, 350));
+		
+		panel.setLayout(new BorderLayout());
+		panel.add(pane);
+		
+		panel.setBackground(background_color);
+		panel.setBounds(x, y, 450, 350);
+		
+		frame.getContentPane().add(panel);
+	}
+	
+	public static JButton add_smallbutton(JFrame frame, int x, int y, Object o) {
+		
+	}
+	
+	public static void remove_list(JFrame frame) {
+		for(Component c : frame.getContentPane().getComponents()) {
+			if(c instanceof JPanel) {
+				frame.getContentPane().remove(c);
+			}
+		}
+	}
+	
+	public static void close_window(JFrame frame) {
+		frame.dispose();
+	}
+}

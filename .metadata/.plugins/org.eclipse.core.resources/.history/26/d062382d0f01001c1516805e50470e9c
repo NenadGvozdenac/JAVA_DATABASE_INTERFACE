@@ -1,0 +1,11 @@
+package database_work;
+
+import javax.swing.*;
+
+public class _gui_interface extends _classes{
+
+	public _gui_interface() {
+		
+	}
+
+}

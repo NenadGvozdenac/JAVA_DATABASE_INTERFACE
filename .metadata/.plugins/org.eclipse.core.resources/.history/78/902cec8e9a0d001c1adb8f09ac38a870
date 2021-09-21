@@ -1,0 +1,87 @@
+package database_work;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import database_work._classes.Date;
+
+public class _database_functions {
+	
+	public static String[] results = new String[40];
+	
+	public static void database_addmember(Connection _connection, String ime, String prezime, Float prosek, Date datum_rodjenja) throws SQLException {
+
+		Statement _statement = _connection.createStatement();
+		
+		String datum = datum_rodjenja.godina + "-" + datum_rodjenja.mesec + "-" + datum_rodjenja.dan;
+
+		_statement.executeUpdate("INSERT INTO BAZASEMA.UCENICI (UCENIK_IME, UCENIK_PREZIME, UCENIK_PROSEK, UCENIK_DATUMRODJENJA) VALUES"
+				+ " ('" + ime + "', '" + prezime + "', '" + prosek + "', '" + datum + "');");
+	}
+	
+	public static void database_cmdoutput(Connection _connection) throws SQLException {
+		
+		Statement _statement = _connection.createStatement();
+		ResultSet select_query = _statement.executeQuery("SELECT * FROM BAZASEMA.UCENICI");
+		
+		while(select_query.next()) {
+			ResultSet st = select_query;
+			System.out.println("ID: " + st.getInt(1) 
+				+ ", NAME: " + st.getString(2) 
+				+ ", LASTNAME: " + st.getString(3) 
+				+ ", GRADE: " + st.getFloat(4) 
+				+ ", BIRTH DATE: " + st.getDate(5)
+			);
+		}
+	}
+	
+	public static void database_clear(Connection _connection) throws SQLException {
+		
+		Statement _statement = _connection.createStatement();
+		
+		_statement.executeUpdate("DELETE FROM BAZASEMA.UCENICI WHERE UCENIK_ID > 0");
+		
+		_statement.executeUpdate("ALTER TABLE BAZASEMA.UCENICI AUTO_INCREMENT = 1");
+		
+	}
+	
+	public static Boolean database_empty(Connection _connection) throws SQLException {
+		
+		Boolean isEmpty = false;;
+		
+		Statement _statement = _connection.createStatement();
+		ResultSet select_query = _statement.executeQuery("SELECT * FROM BAZASEMA.UCENICI");
+		
+		if(select_query.next() == false) {
+			isEmpty = true;
+		}
+		
+		return isEmpty;
+	}
+	
+	public static String[] database_output(Connection _connection) throws SQLException {
+		
+		Statement _statement = _connection.createStatement();
+		ResultSet select_query = _statement.executeQuery("SELECT * FROM BAZASEMA.UCENICI");
+		
+		while(select_query.next()) {
+			ResultSet st = select_query;
+			results[st.getInt(1) - 1] = st.getInt(1) 
+				+ ",    " + st.getString(2) 
+				+ ",    " + st.getDate(5)
+				+ " " + st.getString(3) 
+				+ ",    " + st.getFloat(4) 
+		}
+		
+		return results;
+		
+	}
+	
+	public static void database_close(Connection _connection) throws SQLException {
+		
+		_connection.close();
+		
+	}
+}

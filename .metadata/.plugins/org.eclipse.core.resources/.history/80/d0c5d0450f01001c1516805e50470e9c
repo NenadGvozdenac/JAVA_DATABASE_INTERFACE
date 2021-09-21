@@ -1,0 +1,16 @@
+package database_work;
+
+import javax.swing.*;
+
+public class _gui_interface extends _classes{
+
+	public _gui_interface() {
+		
+		JFrame frame = new JFrame("Hello World");
+		
+		frame.setVisible(true);
+		frame.setAlwaysOnTop(true);
+		
+	}
+
+}

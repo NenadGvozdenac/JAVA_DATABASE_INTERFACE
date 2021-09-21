@@ -1,0 +1,172 @@
+package database_work;
+
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+import javax.swing.WindowConstants;
+import javax.swing.JOptionPane;
+
+public class _main {
+	
+	public static JFrame frame = new JFrame();
+	public static JFrame input_frame = new JFrame();
+	public static JFrame output_frame = new JFrame();
+	public static Connection _connection;
+	
+	public static void main(String[] args) throws SQLException, ClassNotFoundException, UnsupportedAudioFileException, IOException, LineUnavailableException {
+		
+		// Ovde ukljucujemo koji deo zelimo
+		
+		 database_work();
+		 frame_work();
+		 music("C:\\Database_Work\\database_work\\music.wav");
+	}
+	
+	public static void database_work() throws ClassNotFoundException {
+		Class.forName("com.mysql.cj.jdbc.Driver");
+
+		try {
+		_connection = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "gvozdenacnenad");
+		} catch(Exception e) {
+			e.printStackTrace();
+			System.out.println("Could not open program, database not active.\nTerminating program.");
+			System.exit(0);
+		}
+	}
+	
+	public static void frame_work() {
+		_gui_interface.create_window(frame, "Working with databases...", new Dimension(450, 400), WindowConstants.DO_NOTHING_ON_CLOSE);
+		
+		frame.setIconImage(new ImageIcon("C:\\Database_Work\\database_work\\src\\database_work\\iconImage.PNG").getImage());
+		
+		// Funkcija za dodavanje labela u prozor, radi
+		_gui_interface.add_label(frame, 60, 0, new Font("Times New Roman", Font.BOLD, 17), "Hello user. What would you like to do?");
+		_gui_interface.add_label(frame, 5,  70, new Font("Times New Roman", Font.BOLD, 16), "Input person's data");
+		_gui_interface.add_label(frame, 5, 140, new Font("Times New Roman", Font.BOLD, 16), "Read all people's data");
+		_gui_interface.add_label(frame, 5, 210, new Font("Times New Roman", Font.BOLD, 16), "Clear all people's data");
+		_gui_interface.add_label(frame, 5, 280, new Font("Times New Roman", Font.BOLD, 16), "Exit the program");
+		
+		// Funkcija za postavljanje dugmadi na prozor i rad sa njima, povraca ih nazad
+		JButton input_button  = _gui_interface.add_button(frame, 300, 70, new Font("Times New Roman", Font.BOLD, 16), "INPUT");
+		JButton output_button = _gui_interface.add_button(frame, 300, 140, new Font("Times New Roman", Font.BOLD, 16), "OUTPUT");
+		JButton clear_button  = _gui_interface.add_button(frame, 300, 210, new Font("Times New Roman", Font.BOLD, 16), "CLEAR");
+		JButton exit_button   = _gui_interface.add_button(frame, 300, 280, new Font("Times New Roman", Font.BOLD, 16), "EXIT");
+		JButton mute_button   = _gui_interface.add_smallbutton(frame, 5, 310, "C:\\Database_Work\\database_work\\src\\database_work\\unmuteImage.png");
+		
+		// Dodavanje listenera za dugmad, exit odradjen i clear odradjen, treba se input i output uraditi
+		_buttons_functions.pressed(frame, input_button, output_button, clear_button, exit_button);
+		
+		// Za izlazak iz aplikacije na X
+		frame.addWindowListener( new WindowAdapter() {
+		    public void windowClosing(WindowEvent e) {
+		        JFrame frame = (JFrame)e.getSource();
+		 
+		        int result = JOptionPane.showConfirmDialog(
+		            frame,
+		            "Are you sure you want to exit the application?",
+		            "Exit Application",
+		            JOptionPane.YES_NO_OPTION);
+		 
+		        if (result == JOptionPane.YES_OPTION) {
+		            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		    		try {
+						_database_functions.database_close(_connection);
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+		        }
+		    }
+		});
+		
+		// Ne dirati, ovo treba da se program ukljuci
+		frame.setVisible(true);
+	}
+	
+	public static void input_frame() throws SQLException {
+		
+		_gui_interface.create_window(input_frame, "Input into database...", new Dimension(380, 400), WindowConstants.DO_NOTHING_ON_CLOSE);
+		
+		input_frame.setIconImage(new ImageIcon("C:\\Database_Work\\database_work\\src\\database_work\\iconImage.PNG").getImage());
+		
+		_gui_interface.add_label(input_frame, 60, 0, new Font("Times New Roman", Font.BOLD, 16), "You pressed INPUT. Enter the data:");
+		_gui_interface.add_label(input_frame, 5,  70, new Font("Times New Roman", Font.BOLD, 16), "Input person's NAME: ");
+		_gui_interface.add_label(input_frame, 5, 140, new Font("Times New Roman", Font.BOLD, 16), "Input person's LAST NAME: ");
+		_gui_interface.add_label(input_frame, 5, 210, new Font("Times New Roman", Font.BOLD, 16), "Input person's GRADE: ");
+		_gui_interface.add_label(input_frame, 5, 280, new Font("Times New Roman", Font.BOLD, 16), "Input person's BIRTH DATE: ");
+		
+		JTextField input_name      = _gui_interface.add_textBox(input_frame, 250, 65, new Font("Times New Roman", Font.ITALIC, 14), "NAME");
+		JTextField input_lastname  = _gui_interface.add_textBox(input_frame, 250, 135, new Font("Times New Roman", Font.ITALIC, 14), "LAST NAME");
+		JTextField input_grade     = _gui_interface.add_textBox(input_frame, 250, 205, new Font("Times New Roman", Font.ITALIC, 14), "GRADE");
+		JTextField input_birthyear = _gui_interface.add_textBox(input_frame, 250, 275, new Font("Times New Roman", Font.ITALIC, 14), "DD/MM/YYYY");
+		
+		JButton input_button = _gui_interface.add_button(input_frame, 135, 310, new Font("Times New Roman", Font.BOLD, 16), "ADD");
+		
+		_buttons_functions.input_string(input_frame, input_button, input_name, input_lastname, input_grade, input_birthyear);
+		_buttons_functions.resettextonclick(input_frame, input_name, input_lastname, input_grade, input_birthyear);
+		
+		input_frame.addWindowListener( new WindowAdapter() {
+		    public void windowClosing(WindowEvent e) {
+		    	input_frame.dispose();
+		        frame.setVisible(true);
+		    }
+		});
+		
+		input_frame.setVisible(true);
+	}
+	
+	public static void output_frame() throws SQLException {
+		
+		_gui_interface.create_window(output_frame, "Database output", new Dimension(500, 450), WindowConstants.DO_NOTHING_ON_CLOSE);
+		output_frame.setIconImage(new ImageIcon("C:\\Database_Work\\database_work\\src\\database_work\\iconImage.PNG").getImage());
+		
+		_gui_interface.add_label(output_frame, 80, 0, new Font("Times New Roman", Font.BOLD, 16), "You pressed OUTPUT. Data is being loaded...");
+		DefaultListModel<String> listModel = new DefaultListModel<String>();
+		_gui_interface.add_list(output_frame, 20, 30, new Font("Times New Roman", Font.BOLD, 16), listModel);
+		
+		ArrayList<String> podaci = _database_functions.database_output(_connection);
+		
+		for(int i = 0; i < podaci.size(); i++) {
+			listModel.add(i, podaci.get(i));
+		}
+		
+		output_frame.addWindowListener(new WindowAdapter() {
+		    public void windowClosing(WindowEvent e) {
+		    	output_frame.dispose();
+		    	_gui_interface.remove_list(output_frame);
+		        frame.setVisible(true);
+		    }
+		});
+		
+		output_frame.setVisible(true);
+	}
+	
+	public static void music(String path) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
+		
+		File f = new File(path);
+	    @SuppressWarnings("deprecation")
+		AudioInputStream audioIn = AudioSystem.getAudioInputStream(f.toURL());  
+	    Clip clip = AudioSystem.getClip();
+	    clip.open(audioIn);
+	    clip.start();
+	}
+}
